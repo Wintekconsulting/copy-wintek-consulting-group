@@ -110,7 +110,7 @@ const ContactForm = () => {
             </div>
             {status === 'ok' && (
                 <p role="status" style={{ marginTop: '16px', color: '#1a7f37', fontWeight: 600 }}>
-                    ¡Gracias! Hemos recibido tu mensaje y te contactaremos pronto.
+                    ¡Gracias! Tu mensaje se ha enviado correctamente. Nos pondremos en contacto contigo en un plazo máximo de 48 horas.
                 </p>
             )}
             {status === 'error' && (
