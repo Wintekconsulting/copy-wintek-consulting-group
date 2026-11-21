@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import SimpleReactValidator from 'simple-react-validator'
-import { createContact } from '../../utils/server/contacts'
 
 const ContactForm = () => {
 
@@ -10,6 +9,8 @@ const ContactForm = () => {
         phone: '',
         message: ''
     });
+    const [status, setStatus] = useState('idle'); // idle | sending | ok | error
+    const [, forceUpdate] = useState(0);
     const [validator] = useState(new SimpleReactValidator({
         className: 'errorMessage'
     }));
@@ -22,25 +23,29 @@ const ContactForm = () => {
         }
     };
 
-    const submitHandler = e => {
+    const submitHandler = async e => {
         e.preventDefault();
-        
-        const form =  e.currentTarget;
 
-        const formData = new FormData(e.target);
-        const formDataObj = Object.fromEntries(formData);
-
-        createContact(formDataObj);
-        if (validator.allValid()) {
-            validator.hideMessages();
-            setForms({
-                fullname: '',
-                email: '',
-                phone: '',
-                message: ''
-            })
-        } else {
+        if (!validator.allValid()) {
             validator.showMessages();
+            forceUpdate((n) => n + 1);
+            return;
+        }
+
+        const formDataObj = Object.fromEntries(new FormData(e.target));
+        setStatus('sending');
+        try {
+            const r = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formDataObj),
+            });
+            if (!r.ok) throw new Error('send failed');
+            setStatus('ok');
+            validator.hideMessages();
+            setForms({ fullname: '', email: '', phone: '', message: '' });
+        } catch (err) {
+            setStatus('error');
         }
     };
 
@@ -50,7 +55,7 @@ const ContactForm = () => {
                 <div className="col col-lg-6 col-12">
                     <div className="form-field">
                         <input
-                            value={forms.name}
+                            value={forms.fullname}
                             type="text"
                             name="fullname"
                             onBlur={(e) => changeHandler(e)}
@@ -95,9 +100,24 @@ const ContactForm = () => {
                     {validator.message('message', forms.message, 'required')}
                 </div>
             </div>
+            {/* Campo trampa anti-spam, invisible para las personas */}
+            <input type="text" name="website" tabIndex="-1" autoComplete="off"
+                style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true" />
             <div className="submit-area">
-                <button type="submit" className="theme-btn">Enviar</button>
+                <button type="submit" className="theme-btn" disabled={status === 'sending'}>
+                    {status === 'sending' ? 'Enviando…' : 'Enviar'}
+                </button>
             </div>
+            {status === 'ok' && (
+                <p role="status" style={{ marginTop: '16px', color: '#1a7f37', fontWeight: 600 }}>
+                    ¡Gracias! Hemos recibido tu mensaje y te contactaremos pronto.
+                </p>
+            )}
+            {status === 'error' && (
+                <p role="alert" style={{ marginTop: '16px', color: '#c0392b', fontWeight: 600 }}>
+                    No hemos podido enviar tu mensaje. Inténtalo de nuevo en unos minutos.
+                </p>
+            )}
         </form >
     )
 }
