@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import ListItem from "@mui/material/ListItem";
 import Link from "next/link";
+import { SHOW_BLOG } from "../../utils/siteConfig";
 
 const menus = [
     {
@@ -22,7 +23,7 @@ const menus = [
     {
         id: 4,
         title: 'Blog',
-        link: '/?section=blogSec',
+        link: '/blog',
     },
 
     {
@@ -30,7 +31,7 @@ const menus = [
         title: 'Solicita Información',
         link: '/?section=contactSec',
     }
-]
+].filter((menu) => SHOW_BLOG || menu.title !== 'Blog')
 
 
 const MobileMenu = () => {

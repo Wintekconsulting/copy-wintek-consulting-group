@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Logo from '/public/images/logo.png'
 import Link from 'next/link'
+import { SHOW_BLOG } from '../../utils/siteConfig';
 import MobileMenu from '../../components/MobileMenu'
 import HeaderTopbar from '../HeaderTopbar'
 import Image from 'next/image'
@@ -40,9 +41,11 @@ const Header = (props) => {
                                             <Link href="/?section=avancemosSec" >Avancemos Juntos</Link>
                                         </li>
                                         <li><Link href="/?section=contactSec" >Contacto</Link></li>
-                                        <li className="menu-item-has-children">
-                                            <Link href="/?section=blogSec" >Blog</Link>
-                                        </li>
+                                        {SHOW_BLOG && (
+                                            <li className="menu-item-has-children">
+                                                <Link href="/blog" >Blog</Link>
+                                            </li>
+                                        )}
                                     </ul>
                                 </div>
                             </div>

@@ -4,11 +4,9 @@ import Avancemos from '../components/AvancemosSection/Avancemos';
 import Transformando from '../components/TransformaSection/Transformando';
 import Adn from '../components/AdnSection/AdnSection'
 import Solicita from '../components/SolicitaSection/Solicita';
-import { getArticles } from '../utils/services';
-import BlogSection from '../components/BlogSection'
 import BannerSection from '../components/Banner/BannerSection';
 
-const HomePage = ({articles}) => {
+const HomePage = () => {
     const router = useRouter();
     const { section } = router.query;
 
@@ -27,17 +25,8 @@ const HomePage = ({articles}) => {
             <Adn/>
             <Avancemos/>
             <Solicita/>
-            <BlogSection articles={articles}/>
         </Fragment>
     )
 };
 
 export default HomePage;
-
-export async function getStaticProps() {
-    const articles = await getArticles(2);
-    return {
-      props: { articles },
-      revalidate: 10
-    };
-}
